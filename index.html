@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shadow Chat</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+
+  <!-- LANDING SCREEN -->
+  <div id="landing-screen" class="screen active">
+    <div class="landing-bg">
+      <div class="grid-overlay"></div>
+      <div class="orb orb-1"></div>
+      <div class="orb orb-2"></div>
+      <div class="orb orb-3"></div>
+    </div>
+    <div class="landing-center">
+      <div class="logo-block">
+        <div class="logo-icon">
+          <span class="logo-hex">⬡</span>
+          <span class="logo-dot"></span>
+        </div>
+        <h1 class="logo-title">SHADOW</h1>
+        <p class="logo-sub">Meet in the dark. Leave no trace.</p>
+      </div>
+      <div class="landing-cards">
+        <button class="card-btn card-create" onclick="showScreen('create-screen')">
+          <div class="card-icon">+</div>
+          <div class="card-text">
+            <strong>Create Room</strong>
+            <span>Start a private channel</span>
+          </div>
+          <div class="card-arrow">→</div>
+        </button>
+        <button class="card-btn card-join" onclick="showScreen('join-screen')">
+          <div class="card-icon">⬡</div>
+          <div class="card-text">
+            <strong>Join Room</strong>
+            <span>Enter with credentials</span>
+          </div>
+          <div class="card-arrow">→</div>
+        </button>
+      </div>
+      <p class="landing-note">No accounts. No traces. Rooms vanish when empty.</p>
+    </div>
+  </div>
+
+  <!-- CREATE ROOM SCREEN -->
+  <div id="create-screen" class="screen">
+    <div class="form-screen-bg"></div>
+    <div class="form-container">
+      <button class="back-btn" onclick="showScreen('landing-screen')">← Back</button>
+      <div class="form-header">
+        <div class="form-icon create-icon">+</div>
+        <h2>Create a Room</h2>
+        <p>You'll be the admin of this channel</p>
+      </div>
+      <div class="form-body">
+        <div class="field-group">
+          <label>Room Name</label>
+          <input type="text" id="create-room-name" placeholder="e.g. project-alpha" maxlength="30" autocomplete="off" />
+          <span class="field-hint">Others will use this to find your room</span>
+        </div>
+        <div class="field-group">
+          <label>Password</label>
+          <div class="input-with-toggle">
+            <input type="password" id="create-password" placeholder="Set a strong password" autocomplete="off" />
+            <button class="toggle-pass" onclick="togglePass('create-password', this)">👁</button>
+          </div>
+        </div>
+        <div class="field-group">
+          <label>Your Nickname</label>
+          <input type="text" id="create-nickname" placeholder="How others will see you" maxlength="20"
+            autocomplete="off" />
+          <span class="field-hint admin-badge">👑 You'll be the admin</span>
+        </div>
+        <div id="create-error" class="error-msg hidden"></div>
+        <button class="submit-btn" onclick="createRoom()">
+          <span class="btn-text">Launch Room</span>
+          <span class="btn-loader hidden">⟳</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- JOIN ROOM SCREEN -->
+  <div id="join-screen" class="screen">
+    <div class="form-screen-bg"></div>
+    <div class="form-container">
+      <button class="back-btn" onclick="showScreen('landing-screen')">← Back</button>
+      <div class="form-header">
+        <div class="form-icon join-icon">⬡</div>
+        <h2>Join a Room</h2>
+        <p>Enter the room credentials to connect</p>
+      </div>
+      <div class="form-body">
+        <div class="field-group">
+          <label>Room Name</label>
+          <input type="text" id="join-room-name" placeholder="e.g. project-alpha" maxlength="30" autocomplete="off" />
+        </div>
+        <div class="field-group">
+          <label>Password</label>
+          <div class="input-with-toggle">
+            <input type="password" id="join-password" placeholder="Room password" autocomplete="off" />
+            <button class="toggle-pass" onclick="togglePass('join-password', this)">👁</button>
+          </div>
+        </div>
+        <div class="field-group">
+          <label>Your Nickname</label>
+          <input type="text" id="join-nickname" placeholder="How others will see you" maxlength="20"
+            autocomplete="off" />
+        </div>
+        <div id="join-error" class="error-msg hidden"></div>
+        <button class="submit-btn join-submit" onclick="joinRoom()">
+          <span class="btn-text">Enter Room</span>
+          <span class="btn-loader hidden">⟳</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHAT SCREEN -->
+  <div id="chat-screen" class="screen">
+    <div class="chat-layout">
+
+      <!-- SIDEBAR -->
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+          <div class="room-info">
+            <span class="room-badge">⬡</span>
+            <div>
+              <div class="room-name" id="sidebar-room-name">Room</div>
+              <div class="room-status"><span class="status-dot"></span> Live</div>
+            </div>
+          </div>
+          <div class="sidebar-header-actions">
+            <button class="close-sidebar-btn" onclick="toggleSidebar()" title="Close sidebar">←</button>
+            <button class="leave-btn" onclick="leaveRoom()" title="Leave room">X</button>
+          </div>
+        </div>
+        <div class="sidebar-section-label">ONLINE</div>
+        <ul class="user-list" id="user-list"></ul>
+        <div class="sidebar-footer">
+          <div class="my-badge">
+            <span class="my-avatar" id="my-avatar">?</span>
+            <span class="my-nick" id="my-nick">You</span>
+            <span class="my-role" id="my-role"></span>
+          </div>
+        </div>
+      </aside>
+
+      <!-- CHAT MAIN -->
+      <main class="chat-main">
+        <div class="chat-topbar">
+          <button class="sidebar-toggle" onclick="toggleSidebar()" id="sidebar-toggle">☰</button>
+          <div class="topbar-info">
+            <span class="topbar-room" id="topbar-room-name"># room</span>
+            <span class="topbar-count" id="topbar-count">0 online</span>
+          </div>
+          <div class="topbar-actions">
+            <span class="connected-indicator" id="conn-indicator" title="Connected">●</span>
+          </div>
+        </div>
+
+        <div class="messages-area" id="messages-area">
+          <div class="messages-welcome">
+            <div class="welcome-icon">⬡</div>
+            <p>This is the beginning of the channel.</p>
+          </div>
+        </div>
+
+        <div class="typing-bar" id="typing-bar"></div>
+
+        <div class="input-area">
+          <div class="input-wrapper">
+            <div class="emoji-btn" onclick="toggleEmojiPicker()" title="Emoji">😊</div>
+            <textarea id="message-input" placeholder="Send a message..." rows="1" onkeydown="handleKey(event)"
+              oninput="handleTyping()"></textarea>
+            <button class="send-btn" onclick="sendMessage()" title="Send">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <line x1="22" y1="2" x2="11" y2="13"></line>
+                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+              </svg>
+            </button>
+          </div>
+          <div class="emoji-picker hidden" id="emoji-picker"></div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- LEAVE CONFIRM MODAL -->
+  <div id="leave-modal" class="modal hidden">
+    <div class="modal-box">
+      <div class="modal-icon">🚪</div>
+      <h3>Leave Room?</h3>
+      <p>You'll lose access to this conversation. If you're the last one here, the room will be permanently deleted.</p>
+      <div class="modal-actions">
+        <button class="modal-cancel" onclick="closeLeaveModal()">Stay</button>
+        <button class="modal-confirm modal-leave-confirm" onclick="confirmLeave()">Leave</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- KICK CONFIRM MODAL -->
+  <div id="kick-modal" class="modal hidden">
+    <div class="modal-box">
+      <h3>Remove User</h3>
+      <p>Remove <strong id="kick-target-name"></strong> from the room?</p>
+      <div class="modal-actions">
+        <button class="modal-cancel" onclick="closeKickModal()">Cancel</button>
+        <button class="modal-confirm" onclick="confirmKick()">Remove</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div id="toast" class="toast hidden"></div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="app.js"></script>
+</body>
+
+</html>
